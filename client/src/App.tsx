@@ -1,122 +1,100 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import { Room } from "colyseus.js";
+import Title from "./components/Title";
+import Entrance from "./components/Entrance";
+import CreateRoom from "./components/CreateRoom";
+import FindRoom from "./components/FindRoom";
+import RoomView from "./components/RoomView";
+import Game from "./components/Game";
+import Result from "./components/Result";
+
+export type GamePhase = "TITLE" | "ENTRANCE" | "CREATEROOM" | "FINDROOM" | "ROOM" | "GAME" | "RESULT";
+
+export interface UserInfo {
+  userId: string;
+  username: string;
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [phase, setPhase] = useState<GamePhase>("TITLE");
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
+  
+  const handleRegisterSuccess = (userInfo: UserInfo) => {
+    setUser(userInfo);
+    setPhase("ENTRANCE");
+  };
+
+  const handleCreateRoom = () => {
+    setPhase("CREATEROOM");
+  };
+
+  const handleFindRoom = () => {
+    setPhase("FINDROOM");
+  };
+
+  const handleJoinedRoom = (room: Room) => {
+    setCurrentRoom(room);
+    setPhase("ROOM");
+  };
+
+  const handleStartGame = () => {
+    setPhase("GAME");
+  };
+
+  const handleFinishGame = () => {
+    setPhase("RESULT");
+  };
+
+  const handleBackToRoom = () => {
+    setPhase("ROOM");
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-container" style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+      {phase === "TITLE" && (
+        <Title onRegisterSuccess={handleRegisterSuccess} />
+      )}
 
-      <div className="ticks"></div>
+      {phase === "ENTRANCE" && user && (
+        <Entrance 
+          user={user} 
+          onCreateRoom={handleCreateRoom}
+          onFindRoom={handleFindRoom}
+        />
+      )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {phase === "FINDROOM" && (
+        <FindRoom 
+          onJoinedRoom={handleJoinedRoom} 
+        />
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {phase === "CREATEROOM" && (
+        <CreateRoom 
+          onJoinedRoom={handleJoinedRoom} 
+        />
+      )}
+
+      {phase === "ROOM" && currentRoom && (
+        <RoomView 
+          room={currentRoom} 
+          onStartGame={handleStartGame} 
+        />
+      )}
+
+      {phase === "GAME" && currentRoom && (
+        <Game 
+          room={currentRoom} 
+          onFinishGame={handleFinishGame} 
+        />
+      )}
+
+      {phase === "RESULT" && (
+        <Result onBackToRoom={handleBackToRoom} />
+      )}
+    </div>
+  );
 }
 
 export default App
