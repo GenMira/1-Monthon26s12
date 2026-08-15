@@ -1,6 +1,6 @@
 // components/Game.tsx のイメージ
-import React, { useEffect, useRef } from "react";
-import { Room } from "colyseus.js";
+import { useEffect, useRef } from "react";
+import type { Room } from "colyseus.js";
 import { launchPhaserGame } from "../game/PhaserGame";
 
 interface GameProps {
@@ -8,7 +8,7 @@ interface GameProps {
   onFinishGame: () => void;
 }
 
-export default function Game({ room, onFinishGame }: GameProps) {
+export default function Game({ room, onFinishGame: _onFinishGame }: GameProps) {
   const gameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

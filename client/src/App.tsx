@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Room } from "colyseus.js";
+import type { Room } from "colyseus.js";
 import Title from "./components/Title";
 import Entrance from "./components/Entrance";
 import CreateRoom from "./components/CreateRoom";
@@ -7,13 +7,9 @@ import FindRoom from "./components/FindRoom";
 import RoomView from "./components/RoomView";
 import Game from "./components/Game";
 import Result from "./components/Result";
+import type { UserInfo } from "../../resource/types/user";
 
 export type GamePhase = "TITLE" | "ENTRANCE" | "CREATEROOM" | "FINDROOM" | "ROOM" | "GAME" | "RESULT";
-
-export interface UserInfo {
-  userId: string;
-  username: string;
-}
 
 function App() {
   const [phase, setPhase] = useState<GamePhase>("TITLE");
